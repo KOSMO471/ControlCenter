@@ -1,6 +1,6 @@
-# ⚡ Control Center & Mascot Assistant
+# ⚡ Control Center 
 
-**Control Center**, Windows işletim sisteminiz için donanım takibi, sistem yönetimi, hızlı erişim araçları ve etkileşimli bir masaüstü maskotunu tek bir çatı altında toplayan kapsamlı bir WPF (.NET 8) masaüstü uygulamasıdır.
+**Control Center**, Windows işletim sisteminiz için donanım takibi, sistem yönetimi ve hızlı erişim araçları tek bir çatı altında toplayan kapsamlı bir WPF (.NET 8) masaüstü uygulamasıdır.
 
 ![Windows](https://img.shields.io/badge/OS-Windows-blue.svg)
 ![Framework](https://img.shields.io/badge/.NET-8.0-purple.svg)
@@ -17,11 +17,6 @@
 * **Ses Kontrolü:** Sistem ana ses seviyesini uygulama üzerinden kolayca yönetin.
 * **İşlem Yöneticisi (Task Manager):** Çalışan sistem süreçlerini görün ve yüksek kaynak tüketen uygulamaları sonlandırın.
 
-### 🐣 Etkileşimli Masaüstü Maskotu (Kosmo)
-* **Dinamik Durum ve Animasyonlar:** Tıklamalara, duruma (uyku, şaşırma, zıplama vb.) ve sistem olaylarına tepki veren animasyonlu maskot.
-* **Gece Gece / Uyku Modu:** Gece saatlerinde (20:00 - 06:00) otomatik olarak uyku moduna geçer.
-* **Sistem Tepkileri:** Ekran görüntüsü alma, dilsiz/sessiz mod, düşük pil ve hava durumu güncellemelerine özel animasyonlar.
-* **Paskalya Yumurtaları (Easter Eggs):** Özel klavye kombinasyonları (Konami kodu vb.) ile açılan gizli modlar (Nyan mode, Darkness vb.).
 
 ### 🧰 Bütünleşik Araçlar & Widget'lar
 * **Dosya Gezgini:** Metin, görsel, PDF ve medya dosyalarını uygulama içerisinden önizleyin ve düzenleyin.
@@ -57,3 +52,62 @@
    ```bash
    git clone [https://github.com/KOSMO471/ControlCenter.git](https://github.com/KOSMO471/ControlCenter.git)
    cd ControlCenter
+
+   ---
+
+# 🌐 English Documentation
+
+## ⚡ Control Center
+
+**Control Center** is a comprehensive WPF (.NET 8) desktop application that combines hardware monitoring, system management, and quick-access tools under a single roof for your Windows operating system.
+
+![Windows](https://img.shields.io/badge/OS-Windows-blue.svg)
+![Framework](https://img.shields.io/badge/.NET-8.0-purple.svg)
+![Language](https://img.shields.io/badge/C%23-WPF-brightgreen.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+
+---
+
+## ✨ Key Features
+
+### 📊 System & Hardware Monitoring
+* **Real-Time System Metrics:** Track CPU, RAM, GPU usage/temperatures, fan speeds (RPM), and disk statuses in real time.
+* **Network Speed Monitoring:** Display live download and upload speeds.
+* **Audio Control:** Easily manage system master volume directly within the app.
+* **Task Manager:** View running system processes and terminate resource-heavy applications.
+
+### 🧰 Integrated Tools & Widgets
+* **File Explorer:** Preview and edit text, image, PDF, and media files directly inside the application.
+* **Integrated Terminal (CMD & PowerShell):** Fast command execution with advanced "Quick Actions" support.
+* **Pomodoro Timer & Notepad:** Manage focus sessions and take quick notes.
+* **Calculator & Clipboard History:** Perform mathematical calculations and access your copied content history.
+* **Bluetooth & Media Integration:** Control connected Bluetooth devices and manage active media playback.
+
+### 🏆 Achievement System
+* Gamify your system usage with over 30 unlockable achievements (e.g., Night Owl, Marathoner, Terminal Rookie).
+
+---
+
+## 🛠️ Technologies & Libraries
+
+* **Framework:** .NET 8.0 (WPF & Windows Forms Integration)
+* **Hardware Monitoring:** `LibreHardwareMonitorLib`, `System.Diagnostics.PerformanceCounter`
+* **Audio & Media:** `NAudio`, `Windows.Media.Control`
+* **UI Integration:** `Hardcodet.NotifyIcon.Wpf` (System Tray Icon)
+* **Data Processing:** `Newtonsoft.Json`, `DocumentFormat.OpenXml`
+
+---
+
+## 🚀 Installation & Setup
+
+### Prerequisites
+* Windows 10 (Version 19041 or higher)
+* [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+
+### Build Steps
+
+1. Clone the repository to your local machine:
+   ```bash
+   git clone [https://github.com/KOSMO471/ControlCenter.git](https://github.com/KOSMO471/ControlCenter.git)
+   cd ControlCenter
+   
