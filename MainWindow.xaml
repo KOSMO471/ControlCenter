@@ -1,0 +1,521 @@
+<Window x:Class="ControlCenter.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Control Center" Height="900" Width="1500"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WindowBackground}" 
+        Foreground="{DynamicResource TextForeground}">
+
+    <Window.Resources>
+        <!-- Temel Modern Buton Stili -->
+        <Style x:Key="ModernBtn" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource CardBackground}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextForeground}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#2D2D38"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Kısayol Buton Stili -->
+        <Style x:Key="ShortcutBtn" TargetType="Button" BasedOn="{StaticResource ModernBtn}">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Height" Value="32"/>
+        </Style>
+
+        <!-- Dosya Gezgini ListView Stili -->
+        <Style x:Key="FileExplorerListView" TargetType="ListView">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextForeground}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <!-- Dosya Gezgini TreeView Stili -->
+        <Style x:Key="FileExplorerTreeView" TargetType="TreeView">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextForeground}"/>
+        </Style>
+
+        <!-- GridView Kolon Başlık Stili -->
+        <Style TargetType="GridViewColumnHeader">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextForeground}"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Name="MainGrid">
+        <Grid x:Name="DashboardContent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="340"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Sol Panel (Drawer / Menü) -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="6">
+                <Border x:Name="DrawerPanel" Background="{DynamicResource PanelBackground}" CornerRadius="16" Padding="12" Width="280" Visibility="Visible"
+                        AllowDrop="True"
+                        Drop="DrawerPanel_Drop"
+                        DragOver="DrawerPanel_DragOver"
+                        DragEnter="DrawerPanel_DragEnter">
+                    <DockPanel>
+                        <Button x:Name="BtnDosyalar" Style="{StaticResource ModernBtn}" Content="📂 Dosya Gezgini" Height="48" DockPanel.Dock="Top" Margin="0,0,0,12" Click="BtnDosyalar_Click"/>
+                        <Button x:Name="BtnConsoleView" Style="{StaticResource ModernBtn}" Content="💻 CMD / PowerShell" Height="48" DockPanel.Dock="Top" Margin="0,0,0,12" Click="BtnConsoleView_Click"/>
+                        <Button x:Name="BtnAppManager" Style="{StaticResource ModernBtn}" Content="📦 Uygulamalar" Height="48" DockPanel.Dock="Top" Margin="0,0,0,20" Click="BtnAppManager_Click"/>
+                        <Button x:Name="BtnTaskManager" Style="{StaticResource ModernBtn}" Content="📊 İşlem Yöneticisi" Height="48" DockPanel.Dock="Top" Margin="0,0,0,20" Click="BtnTaskManager_Click"/>
+
+                        <!-- Uygulama Kısayolları -->
+                        <Border DockPanel.Dock="Top" Background="{DynamicResource CardBackground}" CornerRadius="12" Padding="10" Margin="0,0,0,10">
+                            <DockPanel>
+                                <TextBlock Text="🚀 Uygulama Kısayolları" DockPanel.Dock="Top" Foreground="Gray" FontWeight="Bold" Margin="0,0,0,8" FontSize="14"/>
+                                <Button Style="{StaticResource ModernBtn}" Content="➕ Uygulama Ekle" DockPanel.Dock="Bottom" Margin="0,8,0,0" Click="BtnAddCustomApp_Click" FontSize="13" Padding="6,4"/>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="120">
+                                    <ItemsControl x:Name="ItemsAppShortcuts">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                    <Button Style="{StaticResource ShortcutBtn}" Content="🗑️" Padding="2" Margin="0,0,4,0" Tag="{Binding}" Click="BtnDeleteShortcut_Click" Background="Transparent" BorderThickness="0"/>
+                                                    <Button Style="{StaticResource ShortcutBtn}" Tag="{Binding Path}" Click="WheelApp_Click" Width="200">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Image Source="{Binding IconImage}" Width="16" Height="16" Margin="0,0,8,0"/>
+                                                            <TextBlock Text="{Binding Icon}" Margin="0,0,8,0" FontSize="14"/>
+                                                            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" FontSize="13"/>
+                                                        </StackPanel>
+                                                    </Button>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </DockPanel>
+                        </Border>
+
+                        <!-- Web Sitesi Kısayolları -->
+                        <Border DockPanel.Dock="Top" Background="{DynamicResource CardBackground}" CornerRadius="12" Padding="10" Margin="0,0,0,10">
+                            <DockPanel>
+                                <TextBlock Text="🌐 Web Sitesi Kısayolları" DockPanel.Dock="Top" Foreground="Gray" FontWeight="Bold" Margin="0,0,0,8" FontSize="14"/>
+                                <Button Style="{StaticResource ModernBtn}" Content="➕ Web Sitesi Ekle" DockPanel.Dock="Bottom" Margin="0,8,0,0" Click="BtnAddWebShortcut_Click" FontSize="13" Padding="6,4"/>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="120">
+                                    <ItemsControl x:Name="ItemsWebShortcuts">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                    <Button Style="{StaticResource ShortcutBtn}" Content="🗑️" Padding="2" Margin="0,0,4,0" Tag="{Binding}" Click="BtnDeleteShortcut_Click" Background="Transparent" BorderThickness="0"/>
+                                                    <Button Style="{StaticResource ShortcutBtn}" Tag="{Binding Path}" Click="WheelApp_Click" Width="200">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Image Source="{Binding IconImage}" Width="16" Height="16" Margin="0,0,8,0"/>
+                                                            <TextBlock Text="{Binding Icon}" Margin="0,0,8,0" FontSize="14"/>
+                                                            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" FontSize="13"/>
+                                                        </StackPanel>
+                                                    </Button>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </DockPanel>
+                        </Border>
+
+                        <Button x:Name="BtnCreator" DockPanel.Dock="Bottom" Style="{StaticResource ModernBtn}" Content="🛠️ KOSMO471" Height="36" Margin="0,10,0,0" Click="BtnCreator_Click" FontSize="13" Padding="8,4"/>
+                        <CheckBox x:Name="ChkStartWithWindows" DockPanel.Dock="Bottom" Content="🔄 Windows ile Başlat" Foreground="{DynamicResource TextForeground}" Margin="0,5,0,0" FontSize="13" Checked="ChkStartWithWindows_Changed" Unchecked="ChkStartWithWindows_Changed"/>
+                    </DockPanel>
+                </Border>
+                <Button x:Name="BtnToggleDrawer" Style="{StaticResource ModernBtn}" Content="◄" Width="28" Height="70" VerticalAlignment="Center" Margin="4,0" Click="BtnToggleDrawer_Click" FontSize="18"/>
+            </StackPanel>
+
+            <!-- Orta Panel (Ana İçerik / Görünümler) -->
+            <Grid Grid.Column="1" Margin="6,12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Saat ve Tarih -->
+                <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,10">
+                    <TextBlock x:Name="TxtClock" Text="00:00" FontSize="52" FontWeight="Bold" Foreground="{DynamicResource TextForeground}" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="TxtDate" Text="--/--/----" FontSize="16" Foreground="#8A8A9E" HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Arama Çubuğu -->
+                <Border Grid.Row="1" CornerRadius="12" Background="{DynamicResource PanelBackground}" Padding="4" Margin="10,0,10,10" BorderBrush="#2D2D38" BorderThickness="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="TxtSearch" Text="İnternette veya Sistemde Ara..." Background="Transparent" Foreground="{DynamicResource TextForeground}" BorderThickness="0" VerticalAlignment="Center" Margin="12,0" KeyDown="TxtSearch_KeyDown" GotFocus="TxtSearch_GotFocus" FontSize="15"/>
+                        <Button Grid.Column="1" Style="{StaticResource ModernBtn}" Content="🔍" Width="44" Height="38" Click="BtnSearch_Click" FontSize="18" Padding="0"/>
+                    </Grid>
+                </Border>
+
+                <!-- Dinamik Görünüm Konteyneri -->
+                <Border Grid.Row="2" Background="{DynamicResource PanelBackground}" CornerRadius="16" Padding="12" BorderBrush="#23232E" BorderThickness="1">
+                    <Grid x:Name="DynamicViewContainer">
+                        
+                        <!-- 1. Dosya Gezgini Görünümü -->
+                        <Grid x:Name="ViewFileManager" Visibility="Visible">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="240"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TreeView x:Name="TreeFolders" Grid.Column="0" Style="{StaticResource FileExplorerTreeView}" SelectedItemChanged="TreeFolders_SelectedItemChanged"/>
+                            <Grid Grid.Column="1" Margin="10,0,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="180"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <ListView x:Name="LstFiles" Grid.Row="0" Style="{StaticResource FileExplorerListView}" SelectionChanged="LstFiles_SelectionChanged">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Dosya Adı" Width="220" DisplayMemberBinding="{Binding Name}"/>
+                                            <GridViewColumn Header="Uzantı" Width="80" DisplayMemberBinding="{Binding Extension}"/>
+                                            <GridViewColumn Header="Boyut" Width="120" DisplayMemberBinding="{Binding Size}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <Border Grid.Row="1" Background="{DynamicResource CardBackground}" CornerRadius="10" Margin="0,10,0,0" Padding="8">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                                            <Button x:Name="BtnSaveTextFile" Style="{StaticResource ModernBtn}" Content="💾 Kaydet" Visibility="Collapsed" Click="BtnSaveTextFile_Click" HorizontalAlignment="Right" FontSize="13" Padding="8,4"/>
+                                        </DockPanel>
+                                        <Grid Grid.Row="1">
+                                            <TextBlock x:Name="TxtReaderPlaceholder" Text="📄 Bir dosya seçin" Foreground="#666" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Visibility="Visible"/>
+                                            <Image x:Name="ImgViewer" Visibility="Collapsed" Stretch="Uniform"/>
+                                            <WebBrowser x:Name="PdfViewer" Visibility="Collapsed"/>
+                                            <MediaElement x:Name="VideoViewer" Visibility="Collapsed" LoadedBehavior="Play" UnloadedBehavior="Stop" Volume="1" Stretch="Uniform"/>
+                                            <TextBox x:Name="TxtViewer" Visibility="Collapsed" IsReadOnly="False" Background="#0A0A0C" Foreground="#00FF66" FontFamily="Consolas" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="Wrap" FontSize="14"/>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Grid>
+
+                        <!-- 2. Widgetlar Görünümü -->
+                        <Grid x:Name="ViewWidgets" Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="5">
+                                <Border Background="{DynamicResource CardBackground}" CornerRadius="12" Padding="10" Margin="0,0,0,10">
+                                    <DockPanel Height="180">
+                                        <TextBlock Text="📝 Not Defteri" DockPanel.Dock="Top" FontWeight="Bold" Margin="0,0,0,8" FontSize="16"/>
+                                        <Button x:Name="BtnSaveNotes" Style="{StaticResource ModernBtn}" Content="Notları Kaydet" DockPanel.Dock="Bottom" Margin="0,6,0,0" Click="BtnSaveNotes_Click" FontSize="13" Padding="8,4"/>
+                                        <TextBox x:Name="TxtNotes" Background="{DynamicResource CardBackground}" Foreground="{DynamicResource TextForeground}" BorderThickness="0" Padding="8" TextWrapping="Wrap" AcceptsReturn="True" FontSize="14"/>
+                                    </DockPanel>
+                                </Border>
+                                <Border Background="{DynamicResource CardBackground}" CornerRadius="12" Padding="12">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="⏱️ Zamanlayıcı" FontWeight="Bold" HorizontalAlignment="Center" FontSize="16"/>
+                                        <TextBlock x:Name="TxtTimer" Text="25:00" FontSize="40" FontWeight="Bold" Margin="0,5" Foreground="{DynamicResource AccentColor}"/>
+                                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                                            <TextBlock Text="Süre (Dk):" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="14"/>
+                                            <TextBox x:Name="TxtTimerInput" Text="25" Width="50" Background="{DynamicResource CardBackground}" Foreground="{DynamicResource TextForeground}" BorderThickness="1" BorderBrush="#333" Padding="4" HorizontalContentAlignment="Center" FontSize="14"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="Ayarla" Margin="5,0,0,0" Click="BtnSetTimer_Click" FontSize="13" Padding="6,4"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                                            <Button Style="{StaticResource ModernBtn}" Content="Başlat / Durdur" Margin="3,0" Click="BtnStartTimer_Click" FontSize="13" Padding="6,4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="Sıfırla" Margin="3,0" Click="BtnResetTimer_Click" FontSize="13" Padding="6,4"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <Border Background="{DynamicResource CardBackground}" Margin="5" CornerRadius="12" Padding="12" Height="auto">
+                                    <DockPanel>
+                                        <TextBlock Text="🧮 Hesap Makinesi" DockPanel.Dock="Top" FontWeight="Bold" Margin="0,0,0,10" FontSize="16"/>
+                                        <TextBox x:Name="TxtCalcDisplay" DockPanel.Dock="Top" Height="45" Background="#0A0A0C" Foreground="#00FF66" FontSize="22" TextAlignment="Right" VerticalContentAlignment="Center" IsReadOnly="True" Padding="8" Margin="0,0,0,10"/>
+                                        <UniformGrid Columns="4" Rows="5">
+                                            <Button Style="{StaticResource ModernBtn}" Content="C" Click="Calc_Clear" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="(" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content=")" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="/" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="7" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="8" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="9" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="*" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="4" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="5" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="6" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="-" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="1" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="2" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="3" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="+" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="0" Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="." Click="Calc_Btn" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="⌫" Click="Calc_Backspace" FontSize="14" Padding="4"/>
+                                            <Button Style="{StaticResource ModernBtn}" Content="=" Background="#0055AA" Click="Calc_Equal" FontSize="14" Padding="4"/>
+                                        </UniformGrid>
+                                    </DockPanel>
+                                </Border>
+
+                                <Border Background="{DynamicResource CardBackground}" Margin="5" CornerRadius="12" Padding="12">
+                                    <DockPanel>
+                                        <TextBlock Text="📋 Pano Geçmişi" DockPanel.Dock="Top" FontWeight="Bold" Margin="0,0,0,10" FontSize="16"/>
+                                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,10,0,0">
+                                            <Button Style="{StaticResource ModernBtn}" Content="🗑️ Temizle" Click="BtnClearClipboard_Click" FontSize="12" Padding="6,2"/>
+                                        </StackPanel>
+                                        <ListBox x:Name="LvClipboard" Background="Transparent" BorderThickness="0" Margin="0,0,0,10" MaxHeight="120">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" Foreground="{DynamicResource TextForeground}" FontSize="13" TextTrimming="CharacterEllipsis" Margin="2"/>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </DockPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- 3. Konsol (CMD / PowerShell) Görünümü -->
+                        <Grid x:Name="ViewConsole" Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                                <RadioButton x:Name="RadCmd" Content="CMD" IsChecked="True" Foreground="{DynamicResource TextForeground}" Margin="0,0,15,0" Checked="ConsoleType_Changed" FontSize="14"/>
+                                <RadioButton x:Name="RadPowerShell" Content="PowerShell" Foreground="{DynamicResource TextForeground}" Checked="ConsoleType_Changed" FontSize="14"/>
+                                <CheckBox x:Name="ChkAdminMode" Content="Yönetici" Foreground="Orange" Margin="20,0,0,0" FontSize="14" Checked="ChkAdminMode_Changed" Unchecked="ChkAdminMode_Changed"/>
+                                <Button x:Name="BtnQuickActions" Style="{StaticResource ModernBtn}" Content="⚡ Hızlı İşlemler" Margin="20,0,0,0" FontSize="12" Padding="6,4" Click="BtnQuickActions_Click"/>
+                            </StackPanel>
+                            <TextBox x:Name="TxtConsoleOutput" Grid.Row="1" Background="#0A0A0C" Foreground="#00FF66" FontFamily="Consolas" IsReadOnly="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" FontSize="14" AllowDrop="True" Drop="TxtConsoleOutput_Drop" DragOver="TxtConsoleOutput_DragOver"/>
+                            <Grid Grid.Row="2" Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="TxtConsoleInput" Grid.Column="0" Background="{DynamicResource CardBackground}" Foreground="{DynamicResource TextForeground}" FontFamily="Consolas" Padding="8" KeyDown="TxtConsoleInput_KeyDown" FontSize="14" AllowDrop="True" Drop="TxtConsoleInput_Drop" DragOver="TxtConsoleInput_DragOver"/>
+                                <Button Grid.Column="1" Style="{StaticResource ModernBtn}" Content="Gönder" Margin="6,0,0,0" Click="BtnSendConsole_Click" FontSize="13" Padding="8,4"/>
+                            </Grid>
+                        </Grid>
+
+                        <!-- 4. Uygulama Yöneticisi Görünümü -->
+                        <Grid x:Name="ViewAppManager" Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Button Grid.Row="0" Style="{StaticResource ModernBtn}" Content="🔄 Uygulamaları Tara" HorizontalAlignment="Left" Margin="0,0,0,10" Click="BtnRefreshApps_Click" FontSize="14" Padding="8,4"/>
+                            <ListView Grid.Row="1" x:Name="LvApps" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource CardBackground}" CornerRadius="8" Margin="5" Padding="8" Width="180" Height="100">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource TextForeground}" FontWeight="SemiBold" FontSize="14"/>
+                                                <TextBlock Text="{Binding Path}" TextWrapping="Wrap" TextAlignment="Center" Foreground="Gray" FontSize="11" Margin="0,2,0,0"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+                                                    <Button Style="{StaticResource ModernBtn}" Content="▶️ Başlat" Margin="0,0,5,0" Click="BtnLaunchApp_Click" Tag="{Binding}" FontSize="11" Padding="4,2"/>
+                                                    <Button Style="{StaticResource ModernBtn}" Content="🗑️ Kaldır" Click="BtnUninstallApp_Click" Tag="{Binding}" FontSize="11" Padding="4,2" Background="#661111"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                                <ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ListView.ItemsPanel>
+                            </ListView>
+                        </Grid>
+
+                        <!-- 5. İşlem Yöneticisi Görünümü -->
+                        <Grid x:Name="ViewTaskManager" Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Button Grid.Row="0" Style="{StaticResource ModernBtn}" Content="🔄 Yenile" HorizontalAlignment="Left" Margin="0,0,0,10" Click="BtnRefreshProcesses_Click" FontSize="14" Padding="8,4"/>
+                            <ListView Grid.Row="1" x:Name="LvProcesses" Background="Transparent" BorderThickness="0" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="İşlem Adı" Width="200" DisplayMemberBinding="{Binding ProcessName}"/>
+                                        <GridViewColumn Header="ID" Width="60" DisplayMemberBinding="{Binding Id}"/>
+                                        <GridViewColumn Header="CPU" Width="60" DisplayMemberBinding="{Binding CpuUsage}"/>
+                                        <GridViewColumn Header="RAM" Width="80" DisplayMemberBinding="{Binding Memory}"/>
+                                        <GridViewColumn Header="İşlem" Width="120">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Style="{StaticResource ModernBtn}" Content="🗑️ Sonlandır" FontSize="11" Padding="4,2" Click="BtnKillProcess_Click" Tag="{Binding}"/>
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </Grid>
+
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Sağ Panel (Sistem Durumu & Donanım Takibi) -->
+            <Border Grid.Column="2" Background="{DynamicResource PanelBackground}" Margin="12" CornerRadius="16" Padding="14">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- CPU Kullanımı & Sıcaklık -->
+                    <Grid Grid.Row="0" Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="CPU" Grid.Column="0" FontSize="12" Foreground="Gray" Margin="0,0,6,0"/>
+                        <ProgressBar x:Name="PbCpuUsage" Grid.Column="1" Height="6" Foreground="{DynamicResource AccentColor}" Background="#252530"/>
+                        <TextBlock x:Name="TxtCpuPercent" Grid.Column="2" Text="0%" FontSize="12" Foreground="White" Width="35" TextAlignment="Right" Margin="4,0,0,0"/>
+                        <TextBlock x:Name="TxtCpuTemp" Grid.Column="3" Text="0°C" FontSize="11" Foreground="Orange" Width="35" TextAlignment="Right" Margin="4,0,0,0"/>
+                    </Grid>
+
+                    <!-- RAM Kullanımı -->
+                    <Grid Grid.Row="1" Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="RAM" Grid.Column="0" FontSize="12" Foreground="Gray" Margin="0,0,6,0"/>
+                        <ProgressBar x:Name="PbRamUsage" Grid.Column="1" Height="6" Foreground="{DynamicResource SuccessColor}" Background="#252530"/>
+                        <TextBlock x:Name="TxtRamPercent" Grid.Column="2" Text="0%" FontSize="12" Foreground="White" Width="35" TextAlignment="Right" Margin="4,0,0,0"/>
+                    </Grid>
+
+                    <!-- GPU Kullanımı & Sıcaklık -->
+                    <Grid Grid.Row="2" Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="GPU" Grid.Column="0" FontSize="12" Foreground="Gray" Margin="0,0,6,0"/>
+                        <ProgressBar x:Name="PbGpuUsage" Grid.Column="1" Height="6" Foreground="Purple" Background="#252530"/>
+                        <TextBlock x:Name="TxtGpuPercent" Grid.Column="2" Text="0%" FontSize="12" Foreground="White" Width="35" TextAlignment="Right" Margin="4,0,0,0"/>
+                        <TextBlock x:Name="TxtGpuTemp" Grid.Column="3" Text="0°C" FontSize="11" Foreground="Orange" Width="35" TextAlignment="Right" Margin="4,0,0,0"/>
+                    </Grid>
+
+                    <!-- Fan Hızı -->
+                    <Grid Grid.Row="3" Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Fan" Grid.Column="0" FontSize="12" Foreground="Gray" Margin="0,0,6,0"/>
+                        <ProgressBar x:Name="PbFanSpeed" Grid.Column="1" Height="6" Foreground="Cyan" Background="#252530"/>
+                        <TextBlock x:Name="TxtFanSpeed" Grid.Column="2" Text="0 RPM" FontSize="12" Foreground="White" Width="45" TextAlignment="Right" Margin="4,0,0,0"/>
+                    </Grid>
+
+                    <!-- Disk C Kullanımı -->
+                    <Grid Grid.Row="4" Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Disk C" Grid.Column="0" FontSize="12" Foreground="Gray" Margin="0,0,6,0"/>
+                        <ProgressBar x:Name="PbDiskC" Grid.Column="1" Height="6" Foreground="Orange" Background="#252530"/>
+                        <TextBlock x:Name="TxtDiskCPercent" Grid.Column="2" Text="0%" FontSize="12" Foreground="White" Width="35" TextAlignment="Right" Margin="4,0,0,0"/>
+                    </Grid>
+
+                    <!-- Disk D Kullanımı -->
+                    <Grid Grid.Row="5" Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Disk D" Grid.Column="0" FontSize="12" Foreground="Gray" Margin="0,0,6,0"/>
+                        <ProgressBar x:Name="PbDiskD" Grid.Column="1" Height="6" Foreground="Orange" Background="#252530"/>
+                        <TextBlock x:Name="TxtDiskDPercent" Grid.Column="2" Text="0%" FontSize="12" Foreground="White" Width="35" TextAlignment="Right" Margin="4,0,0,0"/>
+                    </Grid>
+
+                    <!-- Ağ Hızı -->
+                    <Grid Grid.Row="6" Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="🌐 Ağ" Grid.Column="0" FontSize="12" Foreground="Gray" Margin="0,0,6,0"/>
+                        <TextBlock x:Name="TxtNetSpeed" Grid.Column="1" Text="⬇️ 0 KB/s | ⬆️ 0 KB/s" FontSize="12" Foreground="White" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <!-- Ses Seviyesi Kontrolü -->
+                    <Grid Grid.Row="7" Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="🔊 Ses" Grid.Column="0" FontSize="12" Foreground="Gray" Margin="0,0,6,0"/>
+                        <Slider x:Name="SliderMasterVolume" Grid.Column="1" Minimum="0" Maximum="100" Value="50" ValueChanged="SliderMasterVolume_ValueChanged" Height="16"/>
+                        <TextBlock x:Name="TxtVolumeVal" Grid.Column="2" Text="%50" FontSize="12" Foreground="{DynamicResource AccentColor}" Width="35" TextAlignment="Right" Margin="4,0,0,0"/>
+                    </Grid>
+
+                    <!-- Kısayol / Araç Butonları -->
+                    <StackPanel Grid.Row="8" Margin="0,10,0,6">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button x:Name="BtnAchievements" Style="{StaticResource ModernBtn}" Content="🏆 Başarımlar"
+                                    Height="40" Width="140" Margin="0,0,3,0" Click="BtnAchievements_Click" FontSize="13"/>
+                            <Button x:Name="BtnBluetooth" Style="{StaticResource ModernBtn}" Content="Bluetooth"
+                                    Height="40" Width="140" Margin="3,0,0,0" Click="BtnBluetooth_Click" FontSize="13"/>
+                        </StackPanel>
+                        <Button x:Name="BtnWidgets" Style="{StaticResource ModernBtn}" Content="🧩 Widgetlar &amp; Hesap Makinesi"
+                                Height="40" Margin="0,6,0,0" Click="BtnWidgets_Click" FontSize="13"/>
+                    </StackPanel>
+
+                    <!-- Yardım Butonu -->
+                    <StackPanel Grid.Row="9" Margin="0,4,0,0">
+                        <Button x:Name="BtnHowToUse" Style="{StaticResource ModernBtn}" Content="Nasıl Kullanılır"
+                                Height="36" Click="BtnHowToUse_Click" FontSize="13"/>
+                    </StackPanel>
+
+                    <!-- Alt Bilgi ve Sürüm -->
+                    <StackPanel Grid.Row="10" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                        <TextBlock Text="⚡ Control Center" Foreground="Gray" FontSize="12"/>
+                        <TextBlock Text="Sürüm 1.0" Foreground="#555" FontSize="10" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
